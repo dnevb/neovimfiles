@@ -36,7 +36,7 @@ autocmd({ "BufReadPost", "BufNewFile", "BufWritePost" }, {
     local empty_buffer = vim.fn.resolve(vim.fn.expand "%") == ""
     local greeter = vim.api.nvim_get_option_value("filetype", { buf = args.buf }) == "alpha"
     local git_repo = utils.run_cmd(
-    { "git", "-C", vim.fn.fnamemodify(vim.fn.resolve(vim.fn.expand "%"), ":p:h"), "rev-parse" }, false)
+      { "git", "-C", vim.fn.fnamemodify(vim.fn.resolve(vim.fn.expand "%"), ":p:h"), "rev-parse" }, false)
 
     -- For any file exept empty buffer, or the greeter (alpha)
     if not (empty_buffer or greeter) then
@@ -66,35 +66,35 @@ autocmd({ "VimEnter" }, {
 })
 
 -- 2. Save/restore window layout when possible.
-autocmd({ "BufWinLeave", "BufWritePost", "WinLeave" }, {
-  desc = "Save view with mkview for real files",
-  callback = function(args)
-    if vim.b[args.buf].view_activated then
-      vim.cmd.mkview { mods = { emsg_silent = true } }
-    end
-  end,
-})
-autocmd("BufWinEnter", {
-  desc = "Try to load file view if available and enable view saving for real files",
-  callback = function(args)
-    if not vim.b[args.buf].view_activated then
-      local filetype =
-          vim.api.nvim_get_option_value("filetype", { buf = args.buf })
-      local buftype =
-          vim.api.nvim_get_option_value("buftype", { buf = args.buf })
-      local ignore_filetypes = { "gitcommit", "gitrebase", "svg", "hgcommit" }
-      if
-          buftype == ""
-          and filetype
-          and filetype ~= ""
-          and not vim.tbl_contains(ignore_filetypes, filetype)
-      then
-        vim.b[args.buf].view_activated = true
-        vim.cmd.loadview { mods = { emsg_silent = true } }
-      end
-    end
-  end,
-})
+-- autocmd({ "BufWinLeave", "BufWritePost", "WinLeave" }, {
+--   desc = "Save view with mkview for real files",
+--   callback = function(args)
+--     if vim.b[args.buf].view_activated then
+--       vim.cmd.mkview { mods = { emsg_silent = true } }
+--     end
+--   end,
+-- })
+-- autocmd("BufWinEnter", {
+--   desc = "Try to load file view if available and enable view saving for real files",
+--   callback = function(args)
+--     if not vim.b[args.buf].view_activated then
+--       local filetype =
+--           vim.api.nvim_get_option_value("filetype", { buf = args.buf })
+--       local buftype =
+--           vim.api.nvim_get_option_value("buftype", { buf = args.buf })
+--       local ignore_filetypes = { "gitcommit", "gitrebase", "svg", "hgcommit" }
+--       if
+--           buftype == ""
+--           and filetype
+--           and filetype ~= ""
+--           and not vim.tbl_contains(ignore_filetypes, filetype)
+--       then
+--         vim.b[args.buf].view_activated = true
+--         vim.cmd.loadview { mods = { emsg_silent = true } }
+--       end
+--     end
+--   end,
+-- })
 
 -- 3. Launch alpha greeter on startup
 if is_available "alpha-nvim" then
@@ -161,49 +161,49 @@ if is_available "alpha-nvim" then
 end
 
 -- 4. Update neotree when closing the git client.
-if is_available "neo-tree.nvim" then
-  autocmd("TermClose", {
-    pattern = { "*lazygit", "*gitui" },
-    desc = "Refresh Neo-Tree git when closing lazygit/gitui",
-    callback = function()
-      local manager_avail, manager = pcall(require, "neo-tree.sources.manager")
-      if manager_avail then
-        for _, source in ipairs {
-          "filesystem",
-          "git_status",
-          "document_symbols",
-        } do
-          local module = "neo-tree.sources." .. source
-          if package.loaded[module] then
-            manager.refresh(require(module).name)
-          end
-        end
-      end
-    end,
-  })
-end
+-- if is_available "neo-tree.nvim" then
+--   autocmd("TermClose", {
+--     pattern = { "*lazygit", "*gitui" },
+--     desc = "Refresh Neo-Tree git when closing lazygit/gitui",
+--     callback = function()
+--       local manager_avail, manager = pcall(require, "neo-tree.sources.manager")
+--       if manager_avail then
+--         for _, source in ipairs {
+--           "filesystem",
+--           "git_status",
+--           "document_symbols",
+--         } do
+--           local module = "neo-tree.sources." .. source
+--           if package.loaded[module] then
+--             manager.refresh(require(module).name)
+--           end
+--         end
+--       end
+--     end,
+--   })
+-- end
 
 -- 5. Create parent directories when saving a file.
-autocmd("BufWritePre", {
-  desc = "Automatically create parent directories if they don't exist when saving a file",
-  callback = function(args)
-    local buf_is_valid_and_listed = vim.api.nvim_buf_is_valid(args.buf)
-        and vim.bo[args.buf].buflisted
-
-    if buf_is_valid_and_listed then
-      vim.fn.mkdir(vim.fn.fnamemodify(
-        vim.uv.fs_realpath(args.match) or args.match, ":p:h"), "p")
-    end
-  end,
-})
+-- autocmd("BufWritePre", {
+--   desc = "Automatically create parent directories if they don't exist when saving a file",
+--   callback = function(args)
+--     local buf_is_valid_and_listed = vim.api.nvim_buf_is_valid(args.buf)
+--         and vim.bo[args.buf].buflisted
+--
+--     if buf_is_valid_and_listed then
+--       vim.fn.mkdir(vim.fn.fnamemodify(
+--         vim.uv.fs_realpath(args.match) or args.match, ":p:h"), "p")
+--     end
+--   end,
+-- })
 
 -- ## COOL HACKS ------------------------------------------------------------
 -- 6. Effect: URL underline.
-vim.api.nvim_set_hl(0, 'HighlightURL', { underline = true })
-autocmd({ "VimEnter", "FileType", "BufEnter", "WinEnter" }, {
-  desc = "URL Highlighting",
-  callback = function() utils.set_url_effect() end,
-})
+-- vim.api.nvim_set_hl(0, 'HighlightURL', { underline = true })
+-- autocmd({ "VimEnter", "FileType", "BufEnter", "WinEnter" }, {
+--   desc = "URL Highlighting",
+--   callback = function() utils.set_url_effect() end,
+-- })
 
 -- 7. Customize right click contextual menu.
 autocmd("VimEnter", {
@@ -242,40 +242,40 @@ autocmd("BufWritePre", {
 -------------------------------------------------------------------
 
 -- Customize this command to work as you like
-cmd("TestNodejs", function()
-  -- You can generate code coverage by adding this to your project's packages.json
-  -- "tests": "jest --coverage"
-  vim.cmd(":ProjectRoot")                 -- cd the project root (requires project.nvim)
-  vim.cmd(":TermExec cmd='npm run test'") -- convention to run tests on nodejs
-end, { desc = "Run all unit tests for the current nodejs project" })
+-- cmd("TestNodejs", function()
+--   -- You can generate code coverage by adding this to your project's packages.json
+--   -- "tests": "jest --coverage"
+--   vim.cmd(":ProjectRoot")                 -- cd the project root (requires project.nvim)
+--   vim.cmd(":TermExec cmd='npm run test'") -- convention to run tests on nodejs
+-- end, { desc = "Run all unit tests for the current nodejs project" })
 
 -- Customize this command to work as you like
-cmd("TestNodejsE2e", function()
-  vim.cmd(":ProjectRoot")                -- cd the project root (requires project.nvim)
-  vim.cmd(":TermExec cmd='npm run e2e'") -- Conventional way to call e2e in nodejs (requires ToggleTerm)
-end, { desc = "Run e2e tests for the current nodejs project" })
+-- cmd("TestNodejsE2e", function()
+--   vim.cmd(":ProjectRoot")                -- cd the project root (requires project.nvim)
+--   vim.cmd(":TermExec cmd='npm run e2e'") -- Conventional way to call e2e in nodejs (requires ToggleTerm)
+-- end, { desc = "Run e2e tests for the current nodejs project" })
 
 -- Extra commands
 ----------------------------------------------
 
 -- Change working directory
-cmd("Cwd", function()
-  vim.cmd(":cd %:p:h")
-  vim.cmd(":pwd")
-end, { desc = "cd current file's directory" })
+-- cmd("Cwd", function()
+--   vim.cmd(":cd %:p:h")
+--   vim.cmd(":pwd")
+-- end, { desc = "cd current file's directory" })
 
 -- Set working directory (alias)
-cmd("Swd", function()
-  vim.cmd(":cd %:p:h")
-  vim.cmd(":pwd")
-end, { desc = "cd current file's directory" })
+-- cmd("Swd", function()
+--   vim.cmd(":cd %:p:h")
+--   vim.cmd(":pwd")
+-- end, { desc = "cd current file's directory" })
 
 -- Write all buffers
-cmd("WriteAllBuffers", function()
-  vim.cmd("wa")
-end, { desc = "Write all changed buffers" })
+-- cmd("WriteAllBuffers", function()
+--   vim.cmd("wa")
+-- end, { desc = "Write all changed buffers" })
 
 -- Close all notifications
-cmd("CloseNotifications", function()
-  require("notify").dismiss({ pending = true, silent = true })
-end, { desc = "Dismiss all notifications" })
+-- cmd("CloseNotifications", function()
+--   require("notify").dismiss({ pending = true, silent = true })
+-- end, { desc = "Dismiss all notifications" })
