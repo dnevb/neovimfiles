@@ -116,73 +116,8 @@ maps.n["<leader>q"] = {
   end,
   desc = "Quit",
 }
-maps.n["<Tab>"] = {
-  "<Tab>",
-  noremap = true,
-  silent = true,
-  expr = false,
-  desc = "FIX: Prevent TAB from behaving like <C-i>, as they share the same internal code",
-}
 
 -- clipboard ---------------------------------------------------------------
-
--- BUG: We disable these mappings on termux by default because <C-y>
---      is the keycode for scrolling, and remapping it would break it.
-if not is_android then
-  -- only useful when the option clipboard is commented on ./1-options.lua
-  maps.n["<C-y>"] = { '"+y<esc>', desc = "Copy to cliboard" }
-  maps.x["<C-y>"] = { '"+y<esc>', desc = "Copy to cliboard" }
-  maps.n["<C-d>"] = { '"+y<esc>dd', desc = "Copy to clipboard and delete line" }
-  maps.x["<C-d>"] = { '"+y<esc>dd', desc = "Copy to clipboard and delete line" }
-  maps.n["<C-p>"] = { '"+p<esc>', desc = "Paste from clipboard" }
-end
-
--- Make 'c' key not copy to clipboard when changing a character.
-maps.n["c"] = { '"_c', desc = "Change without yanking" }
-maps.n["C"] = { '"_C', desc = "Change without yanking" }
-maps.x["c"] = { '"_c', desc = "Change without yanking" }
-maps.x["C"] = { '"_C', desc = "Change without yanking" }
-
--- Make 'x' key not copy to clipboard when deleting a character.
-maps.n["x"] = {
-  -- Also let's allow 'x' key to delete blank lines in normal mode.
-  function()
-    if vim.fn.col "." == 1 then
-      local line = vim.fn.getline "."
-      if line:match "^%s*$" then
-        vim.api.nvim_feedkeys('"_dd', "n", false)
-        vim.api.nvim_feedkeys("$", "n", false)
-      else
-        vim.api.nvim_feedkeys('"_x', "n", false)
-      end
-    else
-      vim.api.nvim_feedkeys('"_x', "n", false)
-    end
-  end,
-  desc = "Delete character without yanking it",
-}
-maps.x["x"] = { '"_x', desc = "Delete all characters in line" }
-
--- Same for shifted X
-maps.n["X"] = {
-  -- Also let's allow 'x' key to delete blank lines in normal mode.
-  function()
-    if vim.fn.col "." == 1 then
-      local line = vim.fn.getline "."
-      if line:match "^%s*$" then
-        vim.api.nvim_feedkeys('"_dd', "n", false)
-        vim.api.nvim_feedkeys("$", "n", false)
-      else
-        vim.api.nvim_feedkeys('"_X', "n", false)
-      end
-    else
-      vim.api.nvim_feedkeys('"_X', "n", false)
-    end
-  end,
-  desc = "Delete before character without yanking it",
-}
-maps.x["X"] = { '"_X', desc = "Delete all characters in line" }
-
 -- Override nvim default behavior so it doesn't auto-yank when pasting on visual mode.
 maps.x["p"] = { "P", desc = "Paste content you've previourly yanked" }
 maps.x["P"] = { "p", desc = "Yank what you are going to override, then paste" }
@@ -311,12 +246,14 @@ maps.n["]b"] = {
   end,
   desc = "Next buffer",
 }
+maps.n["<tab>"] = maps.n["]b"]
 maps.n["[b"] = {
   function()
     require("heirline-components.buffer").nav(-(vim.v.count > 0 and vim.v.count or 1))
   end,
   desc = "Previous buffer",
 }
+maps.n["<s-tab>"] = maps.n["[b"]
 maps.n[">b"] = {
   function()
     require("heirline-components.buffer").move(vim.v.count > 0 and vim.v.count or 1)
@@ -868,16 +805,16 @@ if is_available("telescope.nvim") then
     desc = "Find commands",
   }
   -- Let's disable this. It is way too imprecise. Use rnvimr instead.
-  -- maps.n["<leader>ff"] = {
-  --   function()
-  --     require("telescope.builtin").find_files { hidden = true, no_ignore = true }
-  --   end,
-  --   desc = "Find all files",
-  -- }
-  -- maps.n["<leader>fF"] = {
-  --   function() require("telescope.builtin").find_files() end,
-  --   desc = "Find files (no hidden)",
-  -- }
+  maps.n["<leader>f "] = {
+    function()
+      require("telescope.builtin").find_files { hidden = true, no_ignore = true }
+    end,
+    desc = "Find all files",
+  }
+  maps.n["<leader> "] = {
+    function() require("telescope.builtin").find_files() end,
+    desc = "Find files (no hidden)",
+  }
   maps.n["<leader>fh"] = {
     function() require("telescope.builtin").help_tags() end,
     desc = "Find help",
@@ -917,7 +854,7 @@ if is_available("telescope.nvim") then
     end,
     desc = "Find themes",
   }
-  maps.n["<leader>ff"] = {
+  maps.n["<leader>fF"] = {
     function()
       require("telescope.builtin").live_grep {
         additional_args = function(args)
@@ -927,7 +864,7 @@ if is_available("telescope.nvim") then
     end,
     desc = "Find words in project",
   }
-  maps.n["<leader>fF"] = {
+  maps.n["<leader>ff"] = {
     function() require("telescope.builtin").live_grep() end,
     desc = "Find words in project (no hidden)",
   }
@@ -1057,6 +994,8 @@ if is_available("toggleterm.nvim") then
   maps.t["<F7>"] = maps.n["<F7>"]
   maps.n["<C-'>"] = maps.n["<F7>"] -- requires terminal that supports binding <C-'>
   maps.t["<C-'>"] = maps.n["<F7>"] -- requires terminal that supports binding <C-'>
+  maps.n["<C-`>"] = maps.n["<F7>"]
+  maps.t["<C-`>"] = maps.n["<F7>"]
 end
 
 -- extra - improved terminal navigation
@@ -1348,21 +1287,34 @@ function M.lsp_mappings(client, bufnr)
 
   -- Diagnostics
   lsp_mappings.n["<leader>ld"] = { function() vim.diagnostic.open_float() end, desc = "Hover diagnostics" }
-  lsp_mappings.n["[d"] = { function()
+  lsp_mappings.n["[d"] = {
+    function()
       -- TODO: Delete after dropping nvim 0.10 support.
-      if vim.fn.has('nvim-0.11') == 1 then vim.diagnostic.jump({ count = -1 })
-      else vim.diagnostic.goto_prev() end end, desc = "Previous diagnostic"
+      if vim.fn.has('nvim-0.11') == 1 then
+        vim.diagnostic.jump({ count = -1 })
+      else
+        vim.diagnostic.goto_prev()
+      end
+    end,
+    desc = "Previous diagnostic"
   }
-  lsp_mappings.n["]d"] = { function()
-    -- TODO: Delete after dropping nvim 0.10 support.
-    if vim.fn.has('nvim-0.11') == 1 then vim.diagnostic.jump({ count = 1 })
-    else vim.diagnostic.goto_next() end end, desc = "Next diagnostic" }
+  lsp_mappings.n["]d"] = {
+    function()
+      -- TODO: Delete after dropping nvim 0.10 support.
+      if vim.fn.has('nvim-0.11') == 1 then
+        vim.diagnostic.jump({ count = 1 })
+      else
+        vim.diagnostic.goto_next()
+      end
+    end,
+    desc = "Next diagnostic"
+  }
 
   -- Diagnostics
   lsp_mappings.n["gl"] = { function() vim.diagnostic.open_float() end, desc = "Hover diagnostics" }
   if is_available("telescope.nvim") then
     lsp_mappings.n["<leader>lD"] =
-      { function() require("telescope.builtin").diagnostics() end, desc = "Diagnostics" }
+    { function() require("telescope.builtin").diagnostics() end, desc = "Diagnostics" }
   end
 
   -- LSP info
@@ -1439,7 +1391,7 @@ function M.lsp_mappings(client, bufnr)
     autoformat.ignore_filetypes or {}
   ) or not vim.tbl_contains(autoformat.ignore_filetypes, filetype)
 
-if is_autoformat_enabled and is_filetype_allowed and is_filetype_ignored then
+  if is_autoformat_enabled and is_filetype_allowed and is_filetype_ignored then
     utils.add_autocmds_to_buffer("lsp_auto_format", bufnr, {
       events = "BufWritePre", -- Trigger before save
       desc = "Autoformat on save",
