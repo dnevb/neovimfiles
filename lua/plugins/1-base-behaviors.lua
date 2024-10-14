@@ -474,6 +474,7 @@ return {
   --  https://github.com/kevinhwang91/promise-async
   {
     "kevinhwang91/nvim-ufo",
+    enabled = false,
     event = { "User BaseFile" },
     dependencies = { "kevinhwang91/promise-async" },
     opts = {
@@ -700,7 +701,7 @@ return {
       "DistroUpdateRevert"
     },
     opts = {
-      channel = "stable"   -- stable/nightly
+      channel = "stable" -- stable/nightly
     }
   },
 

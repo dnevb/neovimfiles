@@ -195,7 +195,7 @@ return {
     config = function(_, opts)
       require("aerial").setup(opts)
       -- HACK: The first time you open aerial on a session, close all folds.
-      vim.api.nvim_create_autocmd({"FileType", "BufEnter"}, {
+      vim.api.nvim_create_autocmd({ "FileType", "BufEnter" }, {
         desc = "Aerial: When aerial is opened, close all its folds.",
         callback = function()
           local is_aerial = vim.bo.filetype == "aerial"
@@ -219,8 +219,8 @@ return {
     opts = {
       notify = { enabled = false },
       panel = {
-          orientation = "bottom",
-          panel_size = 10,
+        orientation = "bottom",
+        panel_size = 10,
       },
     },
     config = function(_, opts)
@@ -253,8 +253,10 @@ return {
               vim.wo.colorcolumn = "0"
               vim.wo.foldcolumn = "0"
               vim.cmd("silent! PinBuffer") -- stickybuf.nvim
-              vim.cmd("silent! hi LTSymbolJump ctermfg=015 ctermbg=110 cterm=italic,bold,underline guifg=#464646 guibg=#87afd7 gui=italic,bold")
-              vim.cmd("silent! hi LTSymbolJumpRefs ctermfg=015 ctermbg=110 cterm=italic,bold,underline guifg=#464646 guibg=#87afd7 gui=italic,bold")
+              vim.cmd(
+                "silent! hi LTSymbolJump ctermfg=015 ctermbg=110 cterm=italic,bold,underline guifg=#464646 guibg=#87afd7 gui=italic,bold")
+              vim.cmd(
+                "silent! hi LTSymbolJumpRefs ctermfg=015 ctermbg=110 cterm=italic,bold,underline guifg=#464646 guibg=#87afd7 gui=italic,bold")
             else
               vim.cmd("silent! highlight clear LTSymbolJump")
               vim.cmd("silent! highlight clear LTSymbolJumpRefs")
@@ -311,6 +313,7 @@ return {
   --        OPENAI_API_KEY="my_key_here"
   {
     "dense-analysis/neural",
+    enabled = false,
     cmd = { "Neural" },
     config = function()
       require("neural").setup {
@@ -325,7 +328,27 @@ return {
       }
     end,
   },
-
+  {
+    "Exafunction/codeium.nvim",
+    cmd = "Codeium",
+    opts = {
+      enable_chat = true,
+    },
+    specs = {
+      {
+        "hrsh7th/nvim-cmp",
+        optional = true,
+        opts = function(_, opts)
+          -- Inject codeium into cmp sources, with high priority
+          table.insert(opts.sources, 1, {
+            name = "codeium",
+            group_index = 1,
+            priority = 10000,
+          })
+        end,
+      },
+    },
+  },
   --  copilot [github code suggestions]
   --  https://github.com/github/copilot.vim
   --  As alternative to chatgpt, you can use copilot uncommenting this.
@@ -389,7 +412,7 @@ return {
       "OverseerClearCache"
     },
     opts = {
-     task_list = { -- the window that shows the results.
+      task_list = { -- the window that shows the results.
         direction = "bottom",
         min_height = 25,
         max_height = 25,
@@ -610,8 +633,8 @@ return {
           type = 'kotlin',
           request = 'launch',
           name = 'Launch kotlin program',
-          projectRoot = "${workspaceFolder}/app",     -- ensure this is correct
-          mainClass = "AppKt",                        -- ensure this is correct
+          projectRoot = "${workspaceFolder}/app", -- ensure this is correct
+          mainClass = "AppKt",                    -- ensure this is correct
         },
       }
 
@@ -891,8 +914,11 @@ return {
         desc = "Auto generate C/C++ tags",
         callback = function()
           local is_c = vim.bo.filetype == "c" or vim.bo.filetype == "cpp"
-          if is_c then vim.g.gutentags_enabled = 1
-          else vim.g.gutentags_enabled = 0 end
+          if is_c then
+            vim.g.gutentags_enabled = 1
+          else
+            vim.g.gutentags_enabled = 0
+          end
         end,
       })
     end,
