@@ -996,7 +996,7 @@ if is_available("toggleterm.nvim") then
   maps.t["<C-'>"] = maps.n["<F7>"] -- requires terminal that supports binding <C-'>
   maps.n["<C-`>"] = maps.n["<F7>"]
   maps.t["<C-`>"] = maps.n["<F7>"]
-  maps.t["jk"] = { "<C-\\><C-n>", desc = "escape terminal" }
+  maps.t["<Esc><Esc>"] = { "<C-\\><C-n>", desc = "escape terminal" }
 end
 
 -- extra - improved terminal navigation
