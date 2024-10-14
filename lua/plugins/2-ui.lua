@@ -352,31 +352,7 @@ return {
           lib.component.fill { hl = { bg = "tabline_bg" } },
           lib.component.tabline_tabpages()
         },
-        winbar = { -- UI breadcrumbs bar
-          init = function(self) self.bufnr = vim.api.nvim_get_current_buf() end,
-          fallthrough = false,
-          -- Winbar for terminal, neotree, and aerial.
-          {
-            condition = function() return not lib.condition.is_active() end,
-            {
-              lib.component.neotree(),
-              lib.component.compiler_play(),
-              lib.component.fill(),
-              lib.component.compiler_redo(),
-              lib.component.aerial(),
-            },
-          },
-          -- Regular winbar
-          {
-            lib.component.neotree(),
-            lib.component.compiler_play(),
-            lib.component.fill(),
-            lib.component.breadcrumbs(),
-            lib.component.fill(),
-            lib.component.compiler_redo(),
-            lib.component.aerial(),
-          }
-        },
+        winbar = false,
         statuscolumn = { -- UI left column
           init = function(self) self.bufnr = vim.api.nvim_get_current_buf() end,
           lib.component.foldcolumn(),
@@ -387,15 +363,14 @@ return {
           hl = { fg = "fg", bg = "bg" },
           lib.component.mode(),
           lib.component.git_branch(),
-          lib.component.file_info(),
           lib.component.git_diff(),
+          lib.component.lsp(),
           lib.component.diagnostics(),
           lib.component.fill(),
           lib.component.cmd_info(),
           lib.component.fill(),
-          lib.component.lsp(),
-          lib.component.compiler_state(),
-          lib.component.virtual_env(),
+          lib.component.file_info({ filename = {}, filetype = false }),
+          lib.component.file_encoding({ file_format = false }),
           lib.component.nav(),
           lib.component.mode { surround = { separator = "right" } },
         },
