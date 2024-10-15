@@ -328,27 +328,6 @@ return {
       }
     end,
   },
-  {
-    "Exafunction/codeium.nvim",
-    cmd = "Codeium",
-    opts = {
-      enable_chat = true,
-    },
-    specs = {
-      {
-        "hrsh7th/nvim-cmp",
-        optional = true,
-        opts = function(_, opts)
-          -- Inject codeium into cmp sources, with high priority
-          table.insert(opts.sources, 1, {
-            name = "codeium",
-            group_index = 1,
-            priority = 10000,
-          })
-        end,
-      },
-    },
-  },
   --  copilot [github code suggestions]
   --  https://github.com/github/copilot.vim
   --  As alternative to chatgpt, you can use copilot uncommenting this.
